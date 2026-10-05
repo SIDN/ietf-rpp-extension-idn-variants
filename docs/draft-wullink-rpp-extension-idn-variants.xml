@@ -92,6 +92,26 @@
 </tbody>
 </table></section>
 
+<section anchor="external-data-types"><name>External Data Types</name>
+<t>None.</t>
+</section>
+
+<section anchor="result-codes"><name>Result Codes</name>
+<t>None.</t>
+</section>
+
+<section anchor="problem-details"><name>Problem Details</name>
+<t>None.</t>
+</section>
+
+<section anchor="http-headers"><name>HTTP Headers</name>
+<t>None.</t>
+</section>
+
+<section anchor="discovery-document"><name>Discovery Document</name>
+<t>None.</t>
+</section>
+
 <section anchor="updated-data-objects"><name>Updated Data Objects</name>
 
 <section anchor="domain-name-data-object"><name>Domain Name Data Object</name>
@@ -302,26 +322,6 @@
 </artwork>
 <t><strong>TODO:</strong> The restriction that the U-label MUST NOT be used in a URL is under discussion, as it conflicts with the intent of allowing access to a domain resource by both its A-label and U-label form.</t>
 </section>
-</section>
-
-<section anchor="external-data-types"><name>External Data Types</name>
-<t>None.</t>
-</section>
-
-<section anchor="result-codes"><name>Result Codes</name>
-<t>None.</t>
-</section>
-
-<section anchor="problem-details"><name>Problem Details</name>
-<t>None.</t>
-</section>
-
-<section anchor="http-headers"><name>HTTP Headers</name>
-<t>None.</t>
-</section>
-
-<section anchor="discovery-document"><name>Discovery Document</name>
-<t>None.</t>
 </section>
 
 <section anchor="json-schema"><name>JSON Schema</name>

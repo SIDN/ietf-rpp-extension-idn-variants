@@ -90,6 +90,26 @@ In examples, indentation and white space are provided only to illustrate element
 Table: Extension Overview
 {#tbl-extension-overview}
 
+# External Data Types
+
+None.
+
+# Result Codes
+
+None.
+
+# Problem Details
+
+None.
+
+# HTTP Headers
+
+None.
+
+# Discovery Document
+
+None.
+
 # Updated Data Objects
 
 ## Domain Name Data Object
@@ -245,26 +265,6 @@ GET /domainNames/xn--bcher-kva.example
 ```
 
 **TODO:** The restriction that the U-label MUST NOT be used in a URL is under discussion, as it conflicts with the intent of allowing access to a domain resource by both its A-label and U-label form.
-
-# External Data Types
-
-None.
-
-# Result Codes
-
-None.
-
-# Problem Details
-
-None.
-
-# HTTP Headers
-
-None.
-
-# Discovery Document
-
-None.
 
 # JSON Schema
 

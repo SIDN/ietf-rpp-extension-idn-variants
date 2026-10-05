@@ -57,24 +57,24 @@ Table of Contents
    2.  Terminology
    3.  Conventions Used in This Document
    4.  Extension Overview
-   5.  Updated Data Objects
-     5.1.  Domain Name Data Object
-       5.1.1.  Data Elements
-       5.1.2.  Operations
-         5.1.2.1.  Create Operation
-   6.  New Data Objects
-     6.1.  Domain Name Variant Object
-     6.2.  Domain Name Variants Object
-       6.2.1.  Operations
-         6.2.1.1.  Read Operation
-   7.  Endpoints
-     7.1.  HTTP Query Parameters
-     7.2.  Internationalized Domain Names in URLs
-   8.  External Data Types
-   9.  Result Codes
-   10. Problem Details
-   11. HTTP Headers
-   12. Discovery Document
+   5.  External Data Types
+   6.  Result Codes
+   7.  Problem Details
+   8.  HTTP Headers
+   9.  Discovery Document
+   10. Updated Data Objects
+     10.1.  Domain Name Data Object
+       10.1.1.  Data Elements
+       10.1.2.  Operations
+         10.1.2.1.  Create Operation
+   11. New Data Objects
+     11.1.  Domain Name Variant Object
+     11.2.  Domain Name Variants Object
+       11.2.1.  Operations
+         11.2.1.1.  Read Operation
+   12. Endpoints
+     12.1.  HTTP Query Parameters
+     12.2.  Internationalized Domain Names in URLs
    13. JSON Schema
    14. Examples
    15. IANA Considerations
@@ -198,13 +198,33 @@ Table of Contents
 
                        Table 1: Extension Overview
 
-5.  Updated Data Objects
+5.  External Data Types
 
-5.1.  Domain Name Data Object
+   None.
+
+6.  Result Codes
+
+   None.
+
+7.  Problem Details
+
+   None.
+
+8.  HTTP Headers
+
+   None.
+
+9.  Discovery Document
+
+   None.
+
+10.  Updated Data Objects
+
+10.1.  Domain Name Data Object
 
    -  Identifier: domainName
 
-5.1.1.  Data Elements
+10.1.1.  Data Elements
 
    The following data elements are added to the Domain Name Data Object.
    The existing data element name is unchanged, with the following
@@ -222,9 +242,9 @@ Table of Contents
       -  Constraints: The server MAY choose not to include this data
          element if IDN is not supported.
 
-5.1.2.  Operations
+10.1.2.  Operations
 
-5.1.2.1.  Create Operation
+10.1.2.1.  Create Operation
 
    The server MUST validate the name using the procedure described in
    section 4.2 of [RFC5891].  If the validation of the IDN name failed
@@ -234,7 +254,7 @@ Table of Contents
    server MUST respond with an appropriate error indicating the
    mismatch.
 
-5.1.2.1.1.  IDN Variant Detection
+10.1.2.1.1.  IDN Variant Detection
 
    When a create request is submitted for a name associated with a Label
    Generation Ruleset (LGR) (lgr), the server MUST use LGR identified by
@@ -269,9 +289,9 @@ Table of Contents
    bundle rather than forming a new, separate bundle; a bundle MAY
    therefore contain more than two members.
 
-6.  New Data Objects
+11.  New Data Objects
 
-6.1.  Domain Name Variant Object
+11.1.  Domain Name Variant Object
 
    -  Name: Domain Name Variant Object
    -  Identifier: domainVariant
@@ -309,7 +329,7 @@ Table of Contents
          -  Constraints: MUST be one of the following values:
             "registered", "available".
 
-6.2.  Domain Name Variants Object
+11.2.  Domain Name Variants Object
 
    -  Name: Domain Name Variants Object
    -  Identifier: domainVariants
@@ -335,11 +355,11 @@ Table of Contents
             variants of the Domain Name Variants Object.
          -  Constraints: (None)
 
-6.2.1.  Operations
+11.2.1.  Operations
 
    The Domain Name Variants Object only supports the Read operation.
 
-6.2.1.1.  Read Operation
+11.2.1.1.  Read Operation
 
    -  Identifier: read
 
@@ -374,7 +394,7 @@ Table of Contents
             owning domain name, the server MUST return an appropriate
             error.
 
-7.  Endpoints
+12.  Endpoints
 
    The Domain Name Variants Object is exposed as a Direct Access sub-
    resource of a Domain Name resource, at the path derived by the rules
@@ -394,7 +414,7 @@ Table of Contents
    provide the Domain Name Variants Object endpoint, in which case it
    MUST return 404 Not Found or 501 Not Implemented.
 
-7.1.  HTTP Query Parameters
+12.1.  HTTP Query Parameters
 
    The transient data element lgr of the Read operation of the Domain
    Name Variants Object MUST be conveyed, when present, as an HTTP query
@@ -414,7 +434,7 @@ Table of Contents
    is not defined in the Discovery document, decide whether it should
    be.
 
-7.2.  Internationalized Domain Names in URLs
+12.2.  Internationalized Domain Names in URLs
 
    When an Internationalized Domain Name (IDN) is used to identify a
    Domain Name Data Object or Host Data Object instance in a URL, in
@@ -446,26 +466,6 @@ Table of Contents
    *TODO:* The restriction that the U-label MUST NOT be used in a URL is
    under discussion, as it conflicts with the intent of allowing access
    to a domain resource by both its A-label and U-label form.
-
-8.  External Data Types
-
-   None.
-
-9.  Result Codes
-
-   None.
-
-10.  Problem Details
-
-   None.
-
-11.  HTTP Headers
-
-   None.
-
-12.  Discovery Document
-
-   None.
 
 13.  JSON Schema
 

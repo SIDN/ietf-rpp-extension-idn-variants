@@ -64,24 +64,24 @@ Table of Contents
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
    3.  Conventions Used in This Document . . . . . . . . . . . . . .   4
    4.  Extension Overview  . . . . . . . . . . . . . . . . . . . . .   4
-   5.  Updated Data Objects  . . . . . . . . . . . . . . . . . . . .   5
-     5.1.  Domain Name Data Object . . . . . . . . . . . . . . . . .   5
-       5.1.1.  Data Elements . . . . . . . . . . . . . . . . . . . .   5
-       5.1.2.  Operations  . . . . . . . . . . . . . . . . . . . . .   5
-         5.1.2.1.  Create Operation  . . . . . . . . . . . . . . . .   5
-   6.  New Data Objects  . . . . . . . . . . . . . . . . . . . . . .   6
-     6.1.  Domain Name Variant Object  . . . . . . . . . . . . . . .   6
-     6.2.  Domain Name Variants Object . . . . . . . . . . . . . . .   7
-       6.2.1.  Operations  . . . . . . . . . . . . . . . . . . . . .   7
-         6.2.1.1.  Read Operation  . . . . . . . . . . . . . . . . .   8
-   7.  Endpoints . . . . . . . . . . . . . . . . . . . . . . . . . .   8
-     7.1.  HTTP Query Parameters . . . . . . . . . . . . . . . . . .   9
-     7.2.  Internationalized Domain Names in URLs  . . . . . . . . .   9
-   8.  External Data Types . . . . . . . . . . . . . . . . . . . . .  10
-   9.  Result Codes  . . . . . . . . . . . . . . . . . . . . . . . .  10
-   10. Problem Details . . . . . . . . . . . . . . . . . . . . . . .  10
-   11. HTTP Headers  . . . . . . . . . . . . . . . . . . . . . . . .  10
-   12. Discovery Document  . . . . . . . . . . . . . . . . . . . . .  10
+   5.  External Data Types . . . . . . . . . . . . . . . . . . . . .   5
+   6.  Result Codes  . . . . . . . . . . . . . . . . . . . . . . . .   5
+   7.  Problem Details . . . . . . . . . . . . . . . . . . . . . . .   5
+   8.  HTTP Headers  . . . . . . . . . . . . . . . . . . . . . . . .   5
+   9.  Discovery Document  . . . . . . . . . . . . . . . . . . . . .   5
+   10. Updated Data Objects  . . . . . . . . . . . . . . . . . . . .   5
+     10.1.  Domain Name Data Object  . . . . . . . . . . . . . . . .   5
+       10.1.1.  Data Elements  . . . . . . . . . . . . . . . . . . .   5
+       10.1.2.  Operations . . . . . . . . . . . . . . . . . . . . .   5
+         10.1.2.1.  Create Operation . . . . . . . . . . . . . . . .   6
+   11. New Data Objects  . . . . . . . . . . . . . . . . . . . . . .   7
+     11.1.  Domain Name Variant Object . . . . . . . . . . . . . . .   7
+     11.2.  Domain Name Variants Object  . . . . . . . . . . . . . .   7
+       11.2.1.  Operations . . . . . . . . . . . . . . . . . . . . .   8
+         11.2.1.1.  Read Operation . . . . . . . . . . . . . . . . .   8
+   12. Endpoints . . . . . . . . . . . . . . . . . . . . . . . . . .   9
+     12.1.  HTTP Query Parameters  . . . . . . . . . . . . . . . . .   9
+     12.2.  Internationalized Domain Names in URLs . . . . . . . . .  10
    13. JSON Schema . . . . . . . . . . . . . . . . . . . . . . . . .  10
    14. Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .  12
    15. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  13
@@ -228,13 +228,33 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
 
                        Table 1: Extension Overview
 
-5.  Updated Data Objects
+5.  External Data Types
 
-5.1.  Domain Name Data Object
+   None.
+
+6.  Result Codes
+
+   None.
+
+7.  Problem Details
+
+   None.
+
+8.  HTTP Headers
+
+   None.
+
+9.  Discovery Document
+
+   None.
+
+10.  Updated Data Objects
+
+10.1.  Domain Name Data Object
 
    -  Identifier: domainName
 
-5.1.1.  Data Elements
+10.1.1.  Data Elements
 
    The following data elements are added to the Domain Name Data Object.
    The existing data element name is unchanged, with the following
@@ -252,9 +272,17 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
       -  Constraints: The server MAY choose not to include this data
          element if IDN is not supported.
 
-5.1.2.  Operations
+10.1.2.  Operations
 
-5.1.2.1.  Create Operation
+
+
+
+Wullink & Kowalik          Expires 18 May 2027                  [Page 5]
+
+Internet-Draft       IDN Variants extension for RPP        November 2026
+
+
+10.1.2.1.  Create Operation
 
    The server MUST validate the name using the procedure described in
    section 4.2 of [RFC5891].  If the validation of the IDN name failed
@@ -264,7 +292,7 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
    server MUST respond with an appropriate error indicating the
    mismatch.
 
-5.1.2.1.1.  IDN Variant Detection
+10.1.2.1.1.  IDN Variant Detection
 
    When a create request is submitted for a name associated with a Label
    Generation Ruleset (LGR) (lgr), the server MUST use LGR identified by
@@ -274,14 +302,6 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
    -  If the requested name is not a variant of any existing domain
       name, the server MUST proceed to create it as a new, independent
       Domain Name Data Object.
-
-
-
-Wullink & Kowalik          Expires 18 May 2027                  [Page 5]
-
-Internet-Draft       IDN Variants extension for RPP        November 2026
-
-
    -  If the requested name is a variant of an existing domain name, the
       server MUST create the requested domain name only when its
       registrant is the same as the registrant of the existing variant
@@ -307,9 +327,20 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
    bundle rather than forming a new, separate bundle; a bundle MAY
    therefore contain more than two members.
 
-6.  New Data Objects
 
-6.1.  Domain Name Variant Object
+
+
+
+
+
+Wullink & Kowalik          Expires 18 May 2027                  [Page 6]
+
+Internet-Draft       IDN Variants extension for RPP        November 2026
+
+
+11.  New Data Objects
+
+11.1.  Domain Name Variant Object
 
    -  Name: Domain Name Variant Object
    -  Identifier: domainVariant
@@ -330,14 +361,6 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
             ("xn--" prefix) string.
       -  Unicode Name
          -  Identifier: uName
-
-
-
-Wullink & Kowalik          Expires 18 May 2027                  [Page 6]
-
-Internet-Draft       IDN Variants extension for RPP        November 2026
-
-
          -  Cardinality: 1
          -  Mutability: read-only
          -  Data Type: String
@@ -355,7 +378,7 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
          -  Constraints: MUST be one of the following values:
             "registered", "available".
 
-6.2.  Domain Name Variants Object
+11.2.  Domain Name Variants Object
 
    -  Name: Domain Name Variants Object
    -  Identifier: domainVariants
@@ -363,6 +386,14 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
       Domain Name (IDN), can represent both registered and potential
       variants according to the relevant LGR.
    -  Data Elements:
+
+
+
+Wullink & Kowalik          Expires 18 May 2027                  [Page 7]
+
+Internet-Draft       IDN Variants extension for RPP        November 2026
+
+
       -  Label Generation Ruleset (LGR)
          -  Identifier: lgr
          -  Cardinality: 1
@@ -381,20 +412,11 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
             variants of the Domain Name Variants Object.
          -  Constraints: (None)
 
-6.2.1.  Operations
+11.2.1.  Operations
 
    The Domain Name Variants Object only supports the Read operation.
 
-
-
-
-
-Wullink & Kowalik          Expires 18 May 2027                  [Page 7]
-
-Internet-Draft       IDN Variants extension for RPP        November 2026
-
-
-6.2.1.1.  Read Operation
+11.2.1.1.  Read Operation
 
    -  Identifier: read
 
@@ -420,6 +442,14 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
       -  Description: Restricts the variants returned to those computed
          using a single named Label Generation Ruleset (LGR).
       -  Constraints:
+
+
+
+Wullink & Kowalik          Expires 18 May 2027                  [Page 8]
+
+Internet-Draft       IDN Variants extension for RPP        November 2026
+
+
          -  If present, the value MUST be a valid LGR name registered in
             the IANA Label Generation Rulesets registry [IDN-Tables],
             and MUST be applicable to the owning domain name.
@@ -429,26 +459,12 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
             owning domain name, the server MUST return an appropriate
             error.
 
-7.  Endpoints
+12.  Endpoints
 
    The Domain Name Variants Object is exposed as a Direct Access sub-
    resource of a Domain Name resource, at the path derived by the rules
    in [I-D.ietf-rpp-core], and supports only the "read" operation
    defined for it.
-
-
-
-
-
-
-
-
-
-
-Wullink & Kowalik          Expires 18 May 2027                  [Page 8]
-
-Internet-Draft       IDN Variants extension for RPP        November 2026
-
 
       +================+=============+==============================+
       | Operation      | HTTP Method | URL path                     |
@@ -463,7 +479,7 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
    provide the Domain Name Variants Object endpoint, in which case it
    MUST return 404 Not Found or 501 Not Implemented.
 
-7.1.  HTTP Query Parameters
+12.1.  HTTP Query Parameters
 
    The transient data element lgr of the Read operation of the Domain
    Name Variants Object MUST be conveyed, when present, as an HTTP query
@@ -483,7 +499,14 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
    is not defined in the Discovery document, decide whether it should
    be.
 
-7.2.  Internationalized Domain Names in URLs
+
+
+Wullink & Kowalik          Expires 18 May 2027                  [Page 9]
+
+Internet-Draft       IDN Variants extension for RPP        November 2026
+
+
+12.2.  Internationalized Domain Names in URLs
 
    When an Internationalized Domain Name (IDN) is used to identify a
    Domain Name Data Object or Host Data Object instance in a URL, in
@@ -494,17 +517,6 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
    exclusively of ASCII characters and therefore requires no percent-
    encoding or additional Unicode normalization when used as a URL path
    segment.
-
-
-
-
-
-
-
-Wullink & Kowalik          Expires 18 May 2027                  [Page 9]
-
-Internet-Draft       IDN Variants extension for RPP        November 2026
-
 
    The Unicode (U-label) form of an internationalized name MUST NOT be
    used to address a resource in a URL.  A client MAY submit or receive
@@ -527,26 +539,6 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
    under discussion, as it conflicts with the intent of allowing access
    to a domain resource by both its A-label and U-label form.
 
-8.  External Data Types
-
-   None.
-
-9.  Result Codes
-
-   None.
-
-10.  Problem Details
-
-   None.
-
-11.  HTTP Headers
-
-   None.
-
-12.  Discovery Document
-
-   None.
-
 13.  JSON Schema
 
    The extension defines a single JSON Schema document.  The document
@@ -554,6 +546,14 @@ Internet-Draft       IDN Variants extension for RPP        November 2026
    definitions of the Domain Name Data Object, and contributes the new
    properties in separate definitions.  It also defines the Domain Name
    Variant Object and the Domain Name Variants Object.
+
+
+
+
+
+
+
+
 
 
 
