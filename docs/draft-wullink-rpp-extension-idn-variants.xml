@@ -1,0 +1,681 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- name="GENERATOR" content="github.com/mmarkdown/mmark Mmark Markdown Processor - mmark.miek.nl" -->
+<rfc version="3" ipr="trust200902" docName="draft-wullink-rpp-extension-idn-variants-00" submissionType="IETF" category="std" xml:lang="en" xmlns:xi="http://www.w3.org/2001/XInclude" indexInclude="true" tocDepth="4">
+
+<front>
+<title abbrev="IDN Variants extension for RPP">IDN Variants for the RESTful Provisioning Protocol (RPP)</title><seriesInfo value="draft-wullink-rpp-extension-idn-variants-00" stream="IETF" status="standard" name="Internet-Draft"></seriesInfo>
+<author initials="M." surname="Wullink" fullname="Maarten Wullink"><organization>SIDN Labs</organization><address><postal><street></street>
+</postal><email>maarten.wullink@sidn.nl</email>
+<uri>https://sidn.nl/</uri>
+</address></author><author initials="P." surname="Kowalik" fullname="Pawel Kowalik"><organization>DENIC</organization><address><postal><street></street>
+</postal><email>pawel.kowalik@denic.de</email>
+<uri>https://denic.de/</uri>
+</address></author><date year="2026" month="November" day="14"></date>
+<area>Internet</area>
+<workgroup>Network Working Group</workgroup>
+
+<abstract>
+<t>This document specifies an extension to the RESTful Provisioning Protocol (RPP) that addresses the handling of Internationalized Domain Name (IDN) variants. It defines the necessary data objects, operations, and registration requirements to support IDN variants within the RPP framework.</t>
+</abstract>
+
+</front>
+
+<middle>
+
+<section anchor="introduction"><name>Introduction</name>
+<t>This extension uses the guidelines for extending the RESTful Provisioning Protocol (RPP) as described in <xref target="I-D.wullink-rpp-extension-guidelines"></xref>.</t>
+<t>Internationalized Domain Names (IDN) are domain names that include one or more non-ASCII characters. IDNs are represented in the Domain Name System (DNS) using ASCII Compatible Encoding (ACE), commonly known as Punycode. This allows the DNS to handle Unicode domain names while maintaining compatibility with the existing ASCII-based infrastructure.</t>
+<t>An IDN Variant Label is an alternate label that a Label Generation Ruleset (LGR) considers equivalent to another label for registration purposes, typically because the two labels are visually, phonetically, or otherwise linguistically related within a script or language. Two or more domain names are variants of one another when the server, applying the applicable LGR, determines that their labels stand in this relationship.</t>
+<t>A bundle is a logical grouping of two or more domain names that the server has determined to be IDN Variant Labels of one another and that share a common registrant. Each domain name in a bundle remains its own independent Domain Name Data Object, with its own lifecycle, <tt>name</tt>, and other data elements. A bundle is not itself a Data Object: it has no independent lifecycle and is not directly created, read, updated, or deleted through a dedicated resource or operation. Bundle membership is derived by the server as a consequence of variant detection, and a bundle MAY grow to contain more than two members as additional variants are detected over time.</t>
+<t>RPP continues to model every request as acting on a single domain name, addressed by its own <tt>name</tt>; RPP does not define a request or response structure that addresses a bundle as a whole. However, an RPP specification or extension MAY define specific operations (for example, delete or transfer) whose effect, once performed on one domain name, is applied by the server to every domain name in the same bundle. Such operations MUST document this cascading behaviour explicitly; absent such a definition, an operation MUST be understood to affect only the specified domain name.</t>
+<t><strong>TODO:</strong> What operations operate on all variants in a bundle? Transfer?</t>
+</section>
+
+<section anchor="terminology"><name>Terminology</name>
+<t>In this document the following terminology is used.</t>
+<t>Label Generation Ruleset (LGR) - A set of rules defining the valid labels for a registry, including the permitted repertoire, contextual rules, and, where applicable, variant mappings. Also historically known as IDN tables.</t>
+<t>IDN Variant Label - An alternate label that an LGR considers equivalent to another label for registration purposes.</t>
+<t>Bundle - A logical grouping of two or more domain names that the server has determined to be IDN Variant Labels of one another and that share a common registrant.</t>
+<t>A-label - The ASCII Compatible Encoding (ACE) form of an internationalized label, as defined in Section 2.3.2.1 of <xref target="RFC5890"></xref>.</t>
+<t>U-label - The Unicode form of an internationalized label, as defined in Section 2.3.2.1 of <xref target="RFC5890"></xref>.</t>
+</section>
+
+<section anchor="conventions-used-in-this-document"><name>Conventions Used in This Document</name>
+<t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;,&quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this document are to be interpreted as described in <xref target="RFC2119"></xref>.</t>
+<t>In examples, indentation and white space are provided only to illustrate element relationships and are not REQUIRED features of the protocol.</t>
+</section>
+
+<section anchor="extension-overview"><name>Extension Overview</name>
+<table anchor="tbl-extension-overview"><name>Extension Overview</name>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Name</td>
+<td>RPP IDN Variants</td>
+</tr>
+
+<tr>
+<td>Identifier</td>
+<td>urn:ietf:params:rpp:extension:idn-variants</td>
+</tr>
+
+<tr>
+<td>Version</td>
+<td>1.0</td>
+</tr>
+
+<tr>
+<td>RPP version</td>
+<td>1.0</td>
+</tr>
+
+<tr>
+<td>Schema <tt>$id</tt></td>
+<td><eref target="https://rpp.example/schemas/ext-idn-variants.json">https://rpp.example/schemas/ext-idn-variants.json</eref></td>
+</tr>
+
+<tr>
+<td>Changed base objects</td>
+<td>domainName</td>
+</tr>
+
+<tr>
+<td>New objects</td>
+<td>domainVariant, domainVariants</td>
+</tr>
+</tbody>
+</table></section>
+
+<section anchor="updated-data-objects"><name>Updated Data Objects</name>
+
+<section anchor="domain-name-data-object"><name>Domain Name Data Object</name>
+
+<ul spacing="compact">
+<li>Identifier: domainName</li>
+</ul>
+
+<section anchor="data-elements"><name>Data Elements</name>
+<t>The following data elements are added to the Domain Name Data Object. The existing data element <tt>name</tt> is unchanged, with the following additional constraint.</t>
+
+<ul spacing="compact">
+<li><t>Variants</t>
+
+<ul spacing="compact">
+<li>Identifier: variants</li>
+<li>Cardinality: 0-1</li>
+<li>Mutability: read-only</li>
+<li>Data Type: Domain Name Variants Object</li>
+<li>Direct Access: true</li>
+<li>Description: The known Internationalized Domain Name (IDN) variants of the domain name, as determined by the Label Generation Ruleset (LGR).</li>
+<li>Constraints: The server MAY choose not to include this data element if IDN is not supported.</li>
+</ul></li>
+</ul>
+</section>
+
+<section anchor="operations"><name>Operations</name>
+
+<section anchor="create-operation"><name>Create Operation</name>
+<t>The server MUST validate the name using the procedure described in section 4.2 of <xref target="RFC5891"></xref>. If the validation of the IDN name failed because it contained a code point not available in the specified LGR, the server MUST return an error indicating the invalid code point. If the name does not map to the provided Unicode Name (uName), the server MUST respond with an appropriate error indicating the mismatch.</t>
+
+<section anchor="idn-variant-detection"><name>IDN Variant Detection</name>
+<t>When a create request is submitted for a name associated with a Label Generation Ruleset (LGR) (<tt>lgr</tt>), the server MUST use LGR identified by <tt>lgr</tt>, to determine whether the requested name is an IDN variant of any domain name already registered in the same namespace.</t>
+
+<ul spacing="compact">
+<li>If the requested name is not a variant of any existing domain name, the server MUST proceed to create it as a new, independent Domain Name Data Object.</li>
+<li>If the requested name is a variant of an existing domain name, the server MUST create the requested domain name only when its registrant is the same as the registrant of the existing variant domain name. If the registrants differ, the server MUST reject the create operation and return an appropriate error.</li>
+</ul>
+<t>A domain name created under this rule is provisioned and managed as its own independent Domain Name Data Object instance, addressable and operable via its own <tt>name</tt> (Unique Identifier), like any other Domain Name Data Object.</t>
+<t>If the requested name is a variant of an existing domain name, the server MUST add the newly created domain name to a bundle together with the existing variant domain name(s) it was detected against. A bundle is a logical grouping of two or more domain names that the server has determined to be IDN Variant Labels of one another and that share a common registrant. A bundle is not itself a Data Object: it has no independent lifecycle and is not directly created, read, updated, or deleted through a dedicated resource or operation.</t>
+<t>If the existing domain name detected as a variant is already a member of a bundle, the newly created domain name MUST be added to that same bundle rather than forming a new, separate bundle; a bundle MAY therefore contain more than two members.</t>
+</section>
+</section>
+</section>
+</section>
+</section>
+
+<section anchor="new-data-objects"><name>New Data Objects</name>
+
+<section anchor="domain-name-variant-object"><name>Domain Name Variant Object</name>
+
+<ul spacing="compact">
+<li>Name: Domain Name Variant Object</li>
+<li>Identifier: domainVariant</li>
+<li>Description: A container for a variant for an Internationalized Domain Name (IDN), can represent both registered and potential variants according to the relevant LGR.</li>
+<li><t>Data Elements:</t>
+
+<ul spacing="compact">
+<li><t>Name</t>
+
+<ul spacing="compact">
+<li>Identifier: name</li>
+<li>Cardinality: 1</li>
+<li>Mutability: read-only</li>
+<li>Data Type: Fully Qualified Domain Name</li>
+<li>Direct Access: false</li>
+<li>Description: The (ACE) A-label form of the name of the variant.</li>
+<li>Constraints: If the name is represented as a valid ASCII name then the name does not have to be an ACE encoded (&quot;xn--&quot; prefix) string.</li>
+</ul></li>
+<li><t>Unicode Name</t>
+
+<ul spacing="compact">
+<li>Identifier: uName</li>
+<li>Cardinality: 1</li>
+<li>Mutability: read-only</li>
+<li>Data Type: String</li>
+<li>Direct Access: false</li>
+<li>Description: The Unicode representation of the &quot;name&quot; of the variant.</li>
+<li>Constraints: (None)</li>
+</ul></li>
+<li><t>Status</t>
+
+<ul spacing="compact">
+<li>Identifier: status</li>
+<li>Cardinality: 1</li>
+<li>Mutability: read-only</li>
+<li>Data Type: String</li>
+<li>Direct Access: false</li>
+<li>Description: The status of the variant.</li>
+<li>Constraints: MUST be one of the following values: &quot;registered&quot;, &quot;available&quot;.</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+
+<section anchor="domain-name-variants-object"><name>Domain Name Variants Object</name>
+
+<ul spacing="compact">
+<li>Name: Domain Name Variants Object</li>
+<li>Identifier: domainVariants</li>
+<li>Description: A container for the variants for an Internationalized Domain Name (IDN), can represent both registered and potential variants according to the relevant LGR.</li>
+<li><t>Data Elements:</t>
+
+<ul spacing="compact">
+<li><t>Label Generation Ruleset (LGR)</t>
+
+<ul spacing="compact">
+<li>Identifier: lgr</li>
+<li>Cardinality: 1</li>
+<li>Data Type: String</li>
+<li>Description: The Label Generation Ruleset (LGR) used to compute the variants for the Internationalized Domain Name (IDN).</li>
+<li>Constraints: (None)</li>
+</ul></li>
+<li><t>Variants</t>
+
+<ul spacing="compact">
+<li>Identifier: variants</li>
+<li>Cardinality: 0+</li>
+<li>Mutability: read-only</li>
+<li>Data Type: Domain Name Variant Object</li>
+<li>Direct Access: false</li>
+<li>Description: The Internationalized Domain Name (IDN) variants of the Domain Name Variants Object.</li>
+<li>Constraints: (None)</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<section anchor="operations-1"><name>Operations</name>
+<t>The Domain Name Variants Object only supports the Read operation.</t>
+
+<section anchor="read-operation"><name>Read Operation</name>
+
+<ul spacing="compact">
+<li>Identifier: read</li>
+</ul>
+<t>The Read operation allows a client to retrieve the known Internationalized Domain Name (IDN) variants based on the provided input domain name.</t>
+
+<ul>
+<li><t>Authorisation:</t>
+
+<ul spacing="compact">
+<li>Same authorisation rules as the Read Operation of the owning Domain Name Data Object.</li>
+</ul></li>
+<li><t>Input: Object Identifier of the owning Domain Name Data Object</t>
+</li>
+<li><t>Output: Domain Variants Object</t>
+</li>
+</ul>
+<t>The following transient data elements are defined for this operation:</t>
+
+<ul spacing="compact">
+<li><t>Label Generation Ruleset (LGR)</t>
+
+<ul spacing="compact">
+<li>Identifier: lgr</li>
+<li>Cardinality: 0-1</li>
+<li>Data Type: String</li>
+<li>Description: Restricts the variants returned to those computed using a single named Label Generation Ruleset (LGR).</li>
+<li><t>Constraints:</t>
+
+<ul spacing="compact">
+<li>If present, the value MUST be a valid LGR name registered in the IANA Label Generation Rulesets registry <xref target="IDN-Tables"></xref>, and MUST be applicable to the owning domain name.</li>
+<li>If absent, the server MUST compute variants using the default LGR applicable to the relevant owning TLD.</li>
+<li>If the value does not identify an LGR applicable to the owning domain name, the server MUST return an appropriate error.</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+
+<section anchor="endpoints"><name>Endpoints</name>
+<t>The Domain Name Variants Object is exposed as a Direct Access sub-resource of a Domain Name resource, at the path derived by the rules in <xref target="I-D.ietf-rpp-core"></xref>, and supports only the <tt>&quot;read&quot;</tt> operation defined for it.</t>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>HTTP Method</th>
+<th>URL path</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Domain Variants: read</td>
+<td><tt>&quot;GET&quot;</tt></td>
+<td><tt>&quot;/domainNames/{id}/variants&quot;</tt></td>
+</tr>
+</tbody>
+</table><t>A server MAY choose not to implement IDN functionality and not provide the Domain Name Variants Object endpoint, in which case it MUST return 404 Not Found or 501 Not Implemented.</t>
+
+<section anchor="http-query-parameters"><name>HTTP Query Parameters</name>
+<t>The transient data element <tt>lgr</tt> of the Read operation of the Domain Name Variants Object MUST be conveyed, when present, as an HTTP query parameter of the same name on the request URL:</t>
+<t><tt>&quot;GET /domainNames/{id}/variants?lgr={idnLgrName}&quot;</tt></t>
+<t>Valid IDN Label Generation Ruleset (LGR) name values can be discovered by the client, using the <tt>idn_tables</tt> property of the Discovery document. If the <tt>&quot;lgr&quot;</tt> query parameter is omitted, the server MUST compute variants using the default LGR applicable to the relevant owning TLD. If the supplied value does not identify an LGR name applicable to the domain name, the server MUST reject the request with an appropriate error response.</t>
+<t><strong>TODO:</strong> Use either <tt>idn_tables</tt> or <tt>lgr</tt> consistently. The &quot;default LGR&quot; is not defined in the Discovery document, decide whether it should be.</t>
+</section>
+
+<section anchor="internationalized-domain-names-in-urls"><name>Internationalized Domain Names in URLs</name>
+<t>When an Internationalized Domain Name (IDN) is used to identify a Domain Name Data Object or Host Data Object instance in a URL, in particular as the <tt>{id}</tt> path segment, the ASCII Compatible Encoding (ACE) A-label form of the name, as defined in <xref target="RFC5890"></xref>, MUST be used. This requirement ensures that the resulting URL remains a valid URI as defined in <xref target="RFC3986"></xref>, since the A-label form is composed exclusively of ASCII characters and therefore requires no percent-encoding or additional Unicode normalization when used as a URL path segment.</t>
+<t>The Unicode (U-label) form of an internationalized name MUST NOT be used to address a resource in a URL. A client MAY submit or receive the U-label form as a separate data element as part of a resource representation, but this Unicode representation of the name as a whole MUST NOT be used when constructing or matching a URL.</t>
+<t>This is consistent with the use of IDN in the DNS, the actual DNS name is naturally represented using its A-label form. This also avoids ambiguity: the URL identifies the DNS domain name rather than a particular Unicode representation of it.</t>
+<t>For example, to address the domain name whose U-label is <tt>&quot;bücher.example&quot;</tt>, a client MUST use the corresponding A-label, <tt>&quot;xn--bcher-kva.example&quot;</tt>, when constructing the <tt>{id}</tt> path segment:</t>
+
+<artwork><![CDATA[GET /domainNames/xn--bcher-kva.example
+]]>
+</artwork>
+<t><strong>TODO:</strong> The restriction that the U-label MUST NOT be used in a URL is under discussion, as it conflicts with the intent of allowing access to a domain resource by both its A-label and U-label form.</t>
+</section>
+</section>
+
+<section anchor="external-data-types"><name>External Data Types</name>
+<t>None.</t>
+</section>
+
+<section anchor="result-codes"><name>Result Codes</name>
+<t>None.</t>
+</section>
+
+<section anchor="problem-details"><name>Problem Details</name>
+<t>None.</t>
+</section>
+
+<section anchor="http-headers"><name>HTTP Headers</name>
+<t>None.</t>
+</section>
+
+<section anchor="discovery-document"><name>Discovery Document</name>
+<t>None.</t>
+</section>
+
+<section anchor="json-schema"><name>JSON Schema</name>
+<t>The extension defines a single JSON Schema document. The document declares, using <tt>rpp:extends</tt>, that it extends the create and read definitions of the Domain Name Data Object, and contributes the new properties in separate definitions. It also defines the Domain Name Variant Object and the Domain Name Variants Object.</t>
+
+<sourcecode type="json"><![CDATA[{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rpp.example/schemas/ext-idn-variants.json",
+
+  "rpp:extends": {
+    "https://rpp.example/rpp/schema.json#/$defs/domainObject.read": "#/$defs/ext.domain.read"
+  },
+
+  "$defs": {
+    "ext.domain.read": {
+      "type": "object",
+      "properties": {
+        "variants": { "$ref": "#/$defs/domainVariants", "readOnly": true }
+      }
+    },
+    "domainVariant": {
+      "type": "object",
+      "properties": {
+        "@type": { "type": "string", "const": "domainVariant", "readOnly": true },
+        "name": { "type": "string", "readOnly": true },
+        "uName": { "type": "string", "readOnly": true },
+        "status": {
+          "type": "string",
+          "enum": ["registered", "available"],
+          "readOnly": true
+        }
+      },
+      "required": ["@type", "name", "uName", "status"]
+    },
+    "domainVariants": {
+      "type": "object",
+      "properties": {
+        "@type": { "type": "string", "const": "domainVariants", "readOnly": true },
+        "lgr": { "type": "string", "readOnly": true },
+        "variants": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/domainVariant" },
+          "readOnly": true
+        }
+      },
+      "required": ["@type", "lgr", "variants"]
+    }
+  }
+}
+]]>
+</sourcecode>
+<t>The following constraints cannot be expressed in JSON Schema and MUST be enforced by implementations:</t>
+
+<ul spacing="compact">
+<li><tt>name</tt> MUST use the ASCII Compatible Encoding (ACE) A-label form when the domain name is internationalized, as defined in <xref target="RFC5890"></xref>.</li>
+<li><tt>uName</tt>, when present, MUST be normalized to Unicode Normalization Form C (NFC) as defined in <xref target="UNICODE.NFC"></xref>, and MUST convert to the exact value of <tt>name</tt> using the procedure described in Section 4.4 of <xref target="RFC5891"></xref>.</li>
+<li><tt>lgr</tt>, when present, MUST identify a valid LGR registered in the <xref target="IDN-Tables"></xref> registry, and MUST be present whenever <tt>uName</tt> is present.</li>
+</ul>
+</section>
+
+<section anchor="examples"><name>Examples</name>
+<t>Example read response for the internationalized domain name &quot;xn--bcher-kva.example&quot;, which is already registered. The response contains the registration details along with its variants:</t>
+
+<sourcecode type="json"><![CDATA[{
+  "@type": "domainName",
+  "name": "xn--bcher-kva.example",
+  "uName": "bücher.example",
+  "lgr": "latn-1.0",
+  "provMetadata": {
+    "@type": "provMetadata",
+    "repositoryId": "BUCHER1-REP",
+    "spClientId": "ClientX",
+    "crClientId": "ClientX",
+    "crDate": "1999-04-03T22:00:00.0Z"
+  },
+  "variants": {
+    "@type": "domainVariants",
+    "lgr": "latn-1.0",
+    "variants": [
+      {
+        "@type": "domainVariant",
+        "name": "buecher.example",
+        "uName": "buecher.example",
+        "status": "registered"
+      },
+      {
+        "@type": "domainVariant",
+        "name": "bucher.example",
+        "uName": "bucher.example",
+        "status": "available"
+      }
+    ]
+  }
+}
+]]>
+</sourcecode>
+<t>Example response of the Read operation of the Domain Name Variants Object, <tt>GET /domainNames/xn--bcher-kva.example/variants?lgr=latn-1.0</tt>:</t>
+
+<sourcecode type="json"><![CDATA[{
+  "@type": "domainVariants",
+  "lgr": "latn-1.0",
+  "variants": [
+    {
+      "@type": "domainVariant",
+      "name": "buecher.example",
+      "uName": "buecher.example",
+      "status": "registered"
+    },
+    {
+      "@type": "domainVariant",
+      "name": "bucher.example",
+      "uName": "bucher.example",
+      "status": "available"
+    }
+  ]
+}
+]]>
+</sourcecode>
+<t><strong>TODO:</strong> Define how a request for the variants of a domain name that does not exist is handled. Normally this results in 404 Not Found.</t>
+</section>
+
+<section anchor="iana-considerations"><name>IANA Considerations</name>
+<t>This document requests the registrations in this section, as described in <xref target="I-D.wullink-rpp-extension-guidelines"></xref>.</t>
+
+<section anchor="rpp-extensions-registry"><name>RPP Extensions Registry</name>
+<t>IANA is requested to register the following extension in the &quot;RPP Extensions&quot; registry defined in <xref target="I-D.ietf-rpp-core"></xref>:</t>
+
+<ul spacing="compact">
+<li>Name: RPP IDN Variants</li>
+<li>Version: 1.0</li>
+<li>Identifier: urn:ietf:params:rpp:extension:idn-variants</li>
+<li>Specification URL: [This-ID]</li>
+<li>Description: Extension for handling Internationalized Domain Name (IDN) variants</li>
+</ul>
+</section>
+
+<section anchor="rpp-urn-sub-namespace"><name>RPP URN Sub-namespace</name>
+<t>IANA is requested to register the identifier <tt>urn:ietf:params:rpp:extension:idn-variants</tt> in the IETF URN sub-namespace <tt>urn:ietf:params:rpp</tt>, as defined in <xref target="I-D.ietf-rpp-core"></xref>.</t>
+</section>
+
+<section anchor="rpp-data-object-registry"><name>RPP Data Object Registry</name>
+<t>IANA is requested to register the following objects, data elements and operations in the &quot;RPP Data Object Registry&quot; defined in <xref target="I-D.ietf-rpp-data-objects"></xref>. The registration policy is &quot;Specification Required&quot;.</t>
+
+<section anchor="updated-object-domainname"><name>Updated Object: domainName</name>
+<t>The following data element is added to the existing Object definition of <tt>domainName</tt>. The entry references this specification, so that implementations can distinguish it from the data elements of the base specification.</t>
+<t>Object: domainName</t>
+<t>Reference: [This-ID]</t>
+<t>Data Elements</t>
+<table>
+<thead>
+<tr>
+<th>Identifier</th>
+<th>Name</th>
+<th>Card.</th>
+<th>Mutability</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>variants</td>
+<td>Variants</td>
+<td>0-1</td>
+<td>read-only</td>
+<td>Domain Name Variants Object</td>
+<td>The known Internationalized Domain Name (IDN) variants of the domain name, as determined by the Label Generation Ruleset (LGR).</td>
+</tr>
+</tbody>
+</table></section>
+
+<section anchor="new-object-domainvariant"><name>New Object: domainVariant</name>
+<t>Object: domainVariant</t>
+<t>Object Name: Domain Name Variant Object</t>
+<t>Object Type: Component</t>
+<t>Description: A container for a variant of an Internationalized Domain Name (IDN), can represent both registered and potential variants according to the relevant LGR.</t>
+<t>Reference: [This-ID]</t>
+<t>Data Elements</t>
+<table>
+<thead>
+<tr>
+<th>Identifier</th>
+<th>Name</th>
+<th>Card.</th>
+<th>Mutability</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>name</td>
+<td>Name</td>
+<td>1</td>
+<td>read-only</td>
+<td>Fully Qualified Domain Name</td>
+<td>The (ACE) A-label form of the name of the variant.</td>
+</tr>
+
+<tr>
+<td>uName</td>
+<td>Unicode Name</td>
+<td>1</td>
+<td>read-only</td>
+<td>String</td>
+<td>The Unicode representation of the &quot;name&quot; of the variant.</td>
+</tr>
+
+<tr>
+<td>status</td>
+<td>Status</td>
+<td>1</td>
+<td>read-only</td>
+<td>String</td>
+<td>The status of the variant, either &quot;registered&quot; or &quot;available&quot;.</td>
+</tr>
+</tbody>
+</table></section>
+
+<section anchor="new-object-domainvariants"><name>New Object: domainVariants</name>
+<t>Object: domainVariants</t>
+<t>Object Name: Domain Name Variants Object</t>
+<t>Object Type: Resource</t>
+<t>Description: A container for the variants of an Internationalized Domain Name (IDN), can represent both registered and potential variants according to the relevant LGR.</t>
+<t>Reference: [This-ID]</t>
+<t>Data Elements</t>
+<table>
+<thead>
+<tr>
+<th>Identifier</th>
+<th>Name</th>
+<th>Card.</th>
+<th>Mutability</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>lgr</td>
+<td>Label Generation Ruleset (LGR)</td>
+<td>1</td>
+<td>read-only</td>
+<td>String</td>
+<td>The Label Generation Ruleset (LGR) used to compute the variants for the Internationalized Domain Name (IDN).</td>
+</tr>
+
+<tr>
+<td>variants</td>
+<td>Variants</td>
+<td>0+</td>
+<td>read-only</td>
+<td>Domain Name Variant Object</td>
+<td>The Internationalized Domain Name (IDN) variants of the Domain Name Variants Object.</td>
+</tr>
+</tbody>
+</table><t>Operations</t>
+<t>Operation: Read</t>
+<t>Operation Identifier: read</t>
+<t>Description: Retrieves the known Internationalized Domain Name (IDN) variants of the owning Domain Name resource.</t>
+<t>Parameters</t>
+<table>
+<thead>
+<tr>
+<th>Identifier</th>
+<th>Name</th>
+<th>Card.</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>lgr</td>
+<td>Label Generation Ruleset (LGR)</td>
+<td>0-1</td>
+<td>String</td>
+<td>Restricts the variants returned to those computed using a single named Label Generation Ruleset (LGR).</td>
+</tr>
+</tbody>
+</table></section>
+</section>
+</section>
+
+<section anchor="security-considerations"><name>Security Considerations</name>
+<t><strong>TODO</strong></t>
+</section>
+
+<section anchor="internationalization-considerations"><name>Internationalization Considerations</name>
+<t><strong>TODO</strong></t>
+</section>
+
+<section anchor="privacy-considerations"><name>Privacy Considerations</name>
+<t><strong>TODO</strong></t>
+</section>
+
+<section anchor="change-history"><name>Change History</name>
+<t><strong>TODO</strong></t>
+</section>
+
+</middle>
+
+<back>
+<references><name>References</name>
+<references><name>Normative References</name>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-rpp-core.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-rpp-data-objects.xml"/>
+<reference anchor="I-D.wullink-rpp-extension-guidelines" target="">
+  <front>
+    <title>Guidelines for Extending the RESTful Provisioning Protocol (RPP)</title>
+    <author fullname="Maarten Wullink" initials="M." surname="Wullink">
+      <organization>SIDN Labs</organization>
+    </author>
+    <author fullname="Pawel Kowalik" initials="P." surname="Kowalik">
+      <organization>DENIC</organization>
+    </author>
+    <date year="2026"></date>
+  </front>
+  <seriesInfo name="Internet-Draft" value="draft-wullink-rpp-extension-guidelines-00"></seriesInfo>
+</reference>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.3986.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.5890.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"/>
+</references>
+<references><name>Informative References</name>
+<reference anchor="IDN-Tables" target="https://www.iana.org/assignments/idn-tables">
+  <front>
+    <title>Repository of IDN Practices</title>
+    <author>
+      <organization>Internet Assigned Numbers Authority (IANA)</organization>
+    </author>
+  </front>
+</reference>
+<reference anchor="UNICODE.NFC" target="https://www.unicode.org/reports/tr15/">
+  <front>
+    <title>Unicode Normalization Forms</title>
+    <author>
+      <organization>Unicode Consortium</organization>
+    </author>
+    <date year="2026" month="08"></date>
+  </front>
+</reference>
+</references>
+</references>
+
+<section anchor="acknowledgements" numbered="false"><name>Acknowledgements</name>
+<t><strong>TODO</strong></t>
+</section>
+
+</back>
+
+</rfc>
